@@ -238,36 +238,39 @@ def write_midifile(melody, chords, pattern):
     del pattern[1]
     track_melody = midi.Track()
     pattern.append(track_melody)
+
+    track_melody.append(midi.ProgramChangeEvent(tick=0, value=80, channel=0))
     track_melody.append(midi.TrackNameEvent(tick=0, text='Track 1#', data=[84, 114, 97, 99, 107, 32, 49]))
 
     pre_note = None
     for note in melody:
         if pre_note != None:
             tick = int((note.position - pre_note.position) * pattern.resolution)
-            track_melody.append(midi.NoteOffEvent(tick=tick, pitch=pre_note.pitch))
-        track_melody.append(midi.NoteOnEvent(tick=0, velocity=100, pitch=note.pitch))
+            track_melody.append(midi.NoteOffEvent(tick=tick, pitch=pre_note.pitch, channel=0))
+        track_melody.append(midi.NoteOnEvent(tick=0, velocity=100, pitch=note.pitch, channel=0))
         pre_note = note
-    track_melody.append(midi.NoteOffEvent(tick=pattern.resolution * 1, pitch=pre_note.pitch))
-    track_melody.append(midi.EndOfTrackEvent(tick=0))
+    track_melody.append(midi.NoteOffEvent(tick=pattern.resolution * 1, pitch=pre_note.pitch, channel=0))
+    track_melody.append(midi.EndOfTrackEvent(tick=0, channel=0))
 
     track_chord = midi.Track()
     pattern.append(track_chord)
-    track_chord.append(midi.TrackNameEvent(tick=0, text='Track 2#', data=[84, 114, 97, 99, 107, 32, 49]))
+    track_chord.append(midi.ProgramChangeEvent(tick=0, value=48, channel=1))
+    track_chord.append(midi.TrackNameEvent(tick=0, text='Track 2#', data=[84, 114, 97, 99, 107, 32, 49], channel=1))
     pre_chord = None
     for chord in chords:
         if pre_chord != None:
             tick = int((chord[0] - pre_chord[0]) * pattern.resolution)
-            track_chord.append(midi.NoteOnEvent(tick=tick, velocity=0, pitch=0))
+            track_chord.append(midi.NoteOnEvent(tick=tick, velocity=0, pitch=0, channel=1))
 
             for pitch in get_chord_pitches(pre_chord[1]):
-                track_chord.append(midi.NoteOnEvent(tick=0, velocity=0, pitch=pitch))
+                track_chord.append(midi.NoteOnEvent(tick=0, velocity=0, pitch=pitch, channel=1))
 
         for pitch in get_chord_pitches(chord[1]):
-            track_chord.append(midi.NoteOnEvent(tick=0, velocity=80, pitch=pitch))
+            track_chord.append(midi.NoteOnEvent(tick=0, velocity=80, pitch=pitch, channel=1))
         pre_chord = chord
     for i, pitch in enumerate(get_chord_pitches(pre_chord[1])):
-        track_chord.append(midi.NoteOnEvent(tick=pattern.resolution * beat if i == 0 else 0, velocity=0, pitch=pitch))
-    track_chord.append(midi.EndOfTrackEvent(tick=0))
+        track_chord.append(midi.NoteOnEvent(tick=pattern.resolution * beat if i == 0 else 0, velocity=0, pitch=pitch, channel=1))
+    track_chord.append(midi.EndOfTrackEvent(tick=0, channel=1))
 
     midi.write_midifile("output.mid", pattern)
 
