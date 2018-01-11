@@ -12,7 +12,7 @@ class Note():
     def __repr__(self):
         return "<Note pitch={}, position={}, length={}>".format(self.pitch, self.position, self.length)
 
-chord_pattern = {
+chord_pitch_pattern = {
     'C': [0, 4, 7],
     'D': [2, 6, 9],
     'E': [4, 8, 11],
@@ -57,7 +57,7 @@ def get_chords(pattern):
 
 def get_chord_by_events(events):
     scales = list(map(lambda event: event.pitch % 12, events))
-    chord_cands = list(filter(lambda c: set(chord_pattern[c]) == set(scales), chord_pattern))
+    chord_cands = list(filter(lambda c: set(chord_pitch_pattern[c]) == set(scales), chord_pitch_pattern))
     if len(chord_cands) == 1:
         return chord_cands[0]
     else:
@@ -284,6 +284,7 @@ def build_graphs(melody_pattern, chord_pattern):
 
 # graphs: [melody_graph, rhythm_graph, chord_graph]
 def compose_music(graphs, num=8):
+    melody_graph, rhythm_graph, chord_graph = graphs
     chords = compose_chords(chord_graph, num=num)
     rhythm = compose_rhythm(rhythm_graph, num=num)
     melody = compose_melody(melody_graph, rhythm, chords)
@@ -292,10 +293,8 @@ def compose_music(graphs, num=8):
 
 filepath = os.path.join('data', '3_melo.mid')
 melody_pattern = midi.read_midifile(filepath)
-
 filepath = os.path.join('data', '3_chord.mid')
 chord_pattern = midi.read_midifile(filepath)
-
-graphs = build_graphs(chord_pattern, chord_pattern)
-melody, pattern = compose_music(graphs)
-write_midifile(melody, chords, pattern)
+graphs = build_graphs(melody_pattern, chord_pattern)
+melody, chords = compose_music(graphs)
+write_midifile(melody, chords, melody_pattern)
