@@ -239,7 +239,7 @@ def write_midifile(melody, chords, pattern):
     track_melody = midi.Track()
     pattern.append(track_melody)
 
-    track_melody.append(midi.ProgramChangeEvent(tick=0, value=80, channel=0))
+    track_melody.append(midi.ProgramChangeEvent(tick=0, value=0, channel=0))
     track_melody.append(midi.TrackNameEvent(tick=0, text='Track 1#', data=[84, 114, 97, 99, 107, 32, 49]))
 
     pre_note = None
@@ -254,7 +254,7 @@ def write_midifile(melody, chords, pattern):
 
     track_chord = midi.Track()
     pattern.append(track_chord)
-    track_chord.append(midi.ProgramChangeEvent(tick=0, value=48, channel=1))
+    track_chord.append(midi.ProgramChangeEvent(tick=0, value=0, channel=1))
     track_chord.append(midi.TrackNameEvent(tick=0, text='Track 2#', data=[84, 114, 97, 99, 107, 32, 49], channel=1))
     pre_chord = None
     for chord in chords:
