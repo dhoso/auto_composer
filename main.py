@@ -2,6 +2,13 @@ import midi
 import os
 import numpy as np
 import copy
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-n", type=int, help = "the number of bars", required=False, default=8)
+parser.add_argument("-o", type=str, help = "output filename", required=False, default='output.mid')
+
+command_arguments = parser.parse_args()
 
 class Note():
     def __init__(self, pitch, position, length):
@@ -224,7 +231,7 @@ def compose_melody(melody_graph, rhythm, chords):
 def get_chord_at_position(position, chords):
     return max(list(filter(lambda c: c[0] <= position, chords)), key=lambda c:c[0])[1]
 
-def write_midifile(melody, chords, pattern):
+def write_midifile(melody, chords, pattern, filename):
     beat = 4
 
     def get_chord_pitches(chord):
@@ -272,7 +279,7 @@ def write_midifile(melody, chords, pattern):
         track_chord.append(midi.NoteOnEvent(tick=pattern.resolution * beat if i == 0 else 0, velocity=0, pitch=pitch, channel=1))
     track_chord.append(midi.EndOfTrackEvent(tick=0, channel=1))
 
-    midi.write_midifile("output.mid", pattern)
+    midi.write_midifile(filename, pattern)
 
 def build_graphs(melody_pattern, chord_pattern):
     melody = get_melody(melody_pattern)
@@ -299,5 +306,5 @@ melody_pattern = midi.read_midifile(filepath)
 filepath = os.path.join('data', '3_chord.mid')
 chord_pattern = midi.read_midifile(filepath)
 graphs = build_graphs(melody_pattern, chord_pattern)
-melody, chords = compose_music(graphs)
-write_midifile(melody, chords, melody_pattern)
+melody, chords = compose_music(graphs, command_arguments.n)
+write_midifile(melody, chords, melody_pattern, command_arguments.o)
