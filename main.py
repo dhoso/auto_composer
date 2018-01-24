@@ -7,6 +7,8 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-n", type=int, help = "the number of bars", required=False, default=8)
 parser.add_argument("-o", type=str, help = "output filename", required=False, default='output.mid')
+parser.add_argument("--input-chord", type=str, help = "output filename", required=False, default='input_chord.mid')
+parser.add_argument("--input-melody", type=str, help = "output filename", required=False, default='input_melody.mid')
 
 command_arguments = parser.parse_args()
 
@@ -301,9 +303,9 @@ def compose_music(graphs, num=8):
 
     return melody, chords
 
-filepath = os.path.join('data', '3_melo.mid')
+filepath = command_arguments.input_melody
 melody_pattern = midi.read_midifile(filepath)
-filepath = os.path.join('data', '3_chord.mid')
+filepath = command_arguments.input_chord
 chord_pattern = midi.read_midifile(filepath)
 graphs = build_graphs(melody_pattern, chord_pattern)
 melody, chords = compose_music(graphs, command_arguments.n)
